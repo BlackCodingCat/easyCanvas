@@ -1,0 +1,84 @@
+﻿﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Canvas Demo</title>
+	<style>
+		html,body {
+			margin: 0;
+			padding: 0;
+			width: 100%;
+			height: 100%;
+			overflow: hidden;
+			cursor: none;
+			background: black;
+		}
+	</style>
+</head>
+<body>
+		<canvas id="canvas"></canvas>
+
+		<script>
+			var ctx = document.getElementById("canvas"),
+					content = ctx.getContext("2d"),
+					WIDTH,
+					HEIGHT,
+					round = [],
+					initRoundPopulation = 80;
+			WIDTH = document.documentElement.clientWidth;
+			HEIGHT = document.documentElement.clientHeight;
+			ctx.width = WIDTH;
+			ctx.height = HEIGHT;
+
+
+			function Round_item(index,x,y) {
+				this.index = index;
+				this.x = x;
+				this.y = y;
+				this.r = (Math.floor(Math.random() * 2)) + 1; // 半径 in (1,2)
+				let alpha = Math.floor(Math.random() * 10 + 1) / 10 / 2; // 透明度in  [0.05, ... , 0.5]
+				this.color = `rgba(255,255,255,${alpha})`;
+			}
+			Round_item.prototype.draw = function(){
+				content.fillStyle = this.color; // 设置填充颜色
+				content.shadowBlur = this.r * 2; // 设置阴影
+				content.shadowColor = "#fff";
+				// 开始绘制
+				content.beginPath();
+				content.arc(this.x, this.y, this.r, 0, 2 * Math.PI, false);
+				content.closePath();
+				content.fill();
+			}
+			Round_item.prototype.move = function() {
+				this.y -= 0.15;
+				if(this.y < -10) { // 这个父值可以自定义，表示超出屏幕
+					this.y = HEIGHT + 10;
+				}
+				this.draw();
+			}
+
+			function animate() {
+				// 清除屏幕
+				content.clearRect(0, 0, WIDTH, HEIGHT);
+				for(let i in round) {
+					round[i].move();
+				}
+
+				requestAnimationFrame(animate); // 每16.5ms执行一次animate
+			}
+
+			function init() {
+				for(let i = 0; i < initRoundPopulation; i++) {
+					round[i] = new Round_item(i, Math.random() * WIDTH, Math.random() * HEIGHT);
+					round[i].draw();
+				}
+				// 执行运动动画
+				animate();
+			}
+
+			init();
+
+		</script>
+</body>
+</html>

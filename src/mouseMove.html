@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>移动小球</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+		}
+		html,body {
+			width: 100%;
+			height: 100%;
+		}
+		body {
+			background: #000;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="canvas"></canvas>
+
+	<script>
+		let canvas = document.getElementById("canvas"),
+				ctx = canvas.getContext("2d"),
+				WIDTH = document.documentElement.clientWidth,
+				HEIGHT = document.documentElement.clientHeight,
+				param = {
+					num: 100,
+					color: false, // 如果是false 则是随机颜色
+					r: 0.9, // 圆每次增加的半径
+					o: 0.09, // 判断圆消失的条件
+					a: 1
+				},
+				color,
+				color2,
+				round_arr = []
+		canvas.width = WIDTH;
+		canvas.height = HEIGHT;
+		
+		window.onmousemove = function(e) {
+			const mouseX = e.clientX;
+			const mouseY = e.clientY;
+
+			// 储存当前鼠标位置的信息
+			round_arr.push({
+				mouseX: mouseX,
+				mouseY: mouseY,
+				r: param.r,
+				o: 1
+			});
+		}
+		if(param.color) {
+			color2 = param.color; // params中设置的颜色
+		}else {
+			color = Math.random() * 360;
+		}
+
+		function animate() {
+			// 渐变
+			if(!param.color) {
+				color += .1;
+				color2 = `hsl(${color},100%,80%)`; // 设置color2
+			}
+
+			ctx.clearRect(0, 0 , WIDTH, HEIGHT);
+
+			for(let i = 0; i < round_arr.length; i++) {
+				ctx.fillStyle = color2;
+				ctx.beginPath();
+				ctx.arc(round_arr[i].mouseX, round_arr[i].mouseY, round_arr[i].r, 0, Math.PI * 2, false);
+				ctx.closePath();
+				ctx.fill();
+				round_arr[i].r += param.r;
+				round_arr[i].o -= param.o;
+
+				if(round_arr[i].o < param.o) {
+					round_arr.splice(i,1);
+				}
+			}
+
+			window.requestAnimationFrame(animate);
+		}
+
+		animate();
+
+
+	</script>
+</body>
+</html>
